@@ -1,15 +1,16 @@
 from minio import Minio
 import pandas as pd
-from evidently.ui.base import Project
-from evidently.report import Report
-from evidently.metrics import ColumnDriftMetric, ColumnSummaryMetric
-from evidently.metrics import DatasetDriftMetric, DatasetMissingValuesMetric
-from evidently.ui.remote import RemoteWorkspace
+# Evidently 0.7 API (책은 0.5: evidently.report.Report, DatasetDriftMetric, ColumnDriftMetric, add_report)
+from evidently import Report
+from evidently.metrics import DriftedColumnsCount, RowCount, ValueDrift
+from evidently.ui.workspace import Project, RemoteWorkspace
 import mlflow
 from mlflow import MlflowClient
 import json
 import argparse
 import os
+
+DRIFT_COLUMNS = ["Education", "Marital-Status", "Native_country", "Occupation", "Race", "Relationship", "Sex", "Workclass"]
 
 
 def download_file_from_minio(
@@ -102,42 +103,20 @@ def detect_drift(
         file_path=file_path,
     )
 
-    reference_df = pd.read_csv(file_path)
-    feature_df = pd.read_parquet(feature_dataset_path)
-    feature_df.drop(columns=["user_id"], errors="ignore", inplace=True)
-
-    report = Report(
-        metrics=[
-            DatasetDriftMetric(),
-            DatasetMissingValuesMetric(),
-            ColumnDriftMetric(column_name="Education"),
-            ColumnSummaryMetric(column_name="Education"),
-            ColumnDriftMetric(column_name="Marital-Status"),
-            ColumnSummaryMetric(column_name="Marital-Status"),
-            ColumnDriftMetric(column_name="Native_country"),
-            ColumnSummaryMetric(column_name="Native_country"),
-            ColumnDriftMetric(column_name="Occupation"),
-            ColumnSummaryMetric(column_name="Occupation"),
-            ColumnDriftMetric(column_name="Race"),
-            ColumnSummaryMetric(column_name="Race"),
-            ColumnDriftMetric(column_name="Relationship"),
-            ColumnSummaryMetric(column_name="Relationship"),
-            ColumnDriftMetric(column_name="Sex"),
-            ColumnSummaryMetric(column_name="Sex"),
-            ColumnDriftMetric(column_name="Workclass"),
-            ColumnSummaryMetric(column_name="Workclass"),
-        ],
-    )
-    report.run(reference_data=reference_df, current_data=feature_df)
+    # 두 데이터셋을 피처 8개로 맞춤 (현재 데이터에는 event_timestamp 가 남아 있음)
+    reference_df = pd.read_csv(file_path)[DRIFT_COLUMNS]
+    feature_df = pd.read_parquet(feature_dataset_path)[DRIFT_COLUMNS]
+    # 대시보드 패널과 같은 지표: RowCount(Model Calls), DriftedColumnsCount(드리프트 비율), 컬럼별 ValueDrift
+    report = Report([RowCount(), DriftedColumnsCount()] + [ValueDrift(column=c) for c in DRIFT_COLUMNS])
+    snapshot = report.run(reference_data=reference_df, current_data=feature_df)
 
     report_file_path = "drift_report.json"
     with open(report_file_path, "w") as f:
-        f.write(report.json())
+        f.write(snapshot.json())
     print("report written")
     project = get_evidently_project(evidently_workspace, evidently_ui_project_name)
     print("project retreived")
-    evidently_workspace.add_report(project.id, report)
-    project.save()
+    evidently_workspace.add_run(project.id, snapshot)
 
 
 def main():

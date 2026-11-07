@@ -22,7 +22,7 @@ outputs:
   description: Output dataset artifact.
 implementation:
   container:
-    image: 'varunmallya/read-minio-data:latest'
+    image: 'ghcr.io/yeonjukim164/income-classifier-kserve:TAG'
     command:
     - python3
     - /app/src/read_data/read_data.py

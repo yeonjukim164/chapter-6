@@ -9,6 +9,7 @@ on:
       - kserve/*.py
       - kserve/requirements.txt
       - bentoml/src/**
+      - evidently/kubeflow-pipeline/src/**
       - .github/workflows/kserve-image.yml
   workflow_dispatch:
 

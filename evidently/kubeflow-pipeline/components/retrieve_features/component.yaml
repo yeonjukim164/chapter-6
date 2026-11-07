@@ -22,7 +22,7 @@ outputs:
 
 implementation:
   container:
-    image: 'varunmallya/retrieve-feast-features:latest'
+    image: 'ghcr.io/yeonjukim164/income-classifier-kserve:TAG'
     command:
     - python3
     - /app/src/retrieve_features/retrieve_features.py

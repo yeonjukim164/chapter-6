@@ -22,7 +22,7 @@ inputs:
 
 implementation:
   container:
-    image: 'varunmallya/write-minio-data:latest'
+    image: 'ghcr.io/yeonjukim164/income-classifier-kserve:TAG'
     command:
       - python3
       - /app/src/write_data/write_data.py

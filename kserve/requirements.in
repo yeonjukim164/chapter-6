@@ -9,4 +9,5 @@ scikit-learn==1.9.1
 pandas<3
 feast[aws,redis]==0.67.0
 minio==7.2.20
+s3fs                     # KFP 피처 조회 컴포넌트: Feast 오프라인 스토어(S3 parquet)
 evidently==0.7.23        # 6.2.3 실시간 드리프트 (Transformer 안 MonitoringService)

@@ -1,5 +1,5 @@
 import kfp
-from kfp import dsl, compiler
+from kfp import dsl, compiler, kubernetes
 
 # Load KFP v2-compatible components
 fetch_data_op = kfp.components.load_component_from_file(
@@ -96,6 +96,9 @@ def income_classifier_pipeline(
         file_name=output_file_name,
         input_data=run_inference_task.outputs["data_output"],
     )
+    # 컴포넌트 이미지는 GHCR 비공개 패키지 → 사용자 네임스페이스의 ghcr-pull Secret 으로 받음
+    for task in (fetch_data_task, retrieve_features_task, detect_drift_task, run_inference_task, write_data_task):
+        kubernetes.set_image_pull_secrets(task, ["ghcr-pull"])
 
 
 # Compile pipeline to YAML

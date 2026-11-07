@@ -24,7 +24,7 @@ outputs:
 
 implementation:
   container:
-    image: 'varunmallya/run-inference:latest'
+    image: 'ghcr.io/yeonjukim164/income-classifier-kserve:TAG'
     command:
     - python3
     - /app/src/run_inference/run_inference.py

@@ -24,7 +24,7 @@ inputs:
 
 implementation:
   container:
-    image: 'varunmallya/detect-drift:latest'
+    image: 'ghcr.io/yeonjukim164/income-classifier-kserve:TAG'
     command:
     - python3
     - /app/src/detect_drift/detect_drift.py
