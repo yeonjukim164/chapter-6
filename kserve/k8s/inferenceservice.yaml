@@ -14,7 +14,7 @@ spec:
     - name: ghcr-pull
     containers:
     - name: kserve-container
-      image: ghcr.io/yeonjukim164/income-classifier-kserve:1db92c4
+      image: ghcr.io/yeonjukim164/income-classifier-kserve:8870940
       command: ["python", "predictor.py", "--model_name", "income-classifier"]
       env:
       # MLflow 레지스트리의 random-forest-classifier v1(Production) 모델 위치. storage-initializer 가 /mnt/models 로 내려받음
@@ -24,11 +24,14 @@ spec:
         requests: {cpu: 100m, memory: 384Mi}
         limits: {memory: 1Gi}
   transformer:
+    # 실시간 드리프트 윈도를 파드 메모리에 쌓으므로 레플리카 1개 (기존 환경의 api_server.workers=1 과 같은 이유)
+    minReplicas: 1
+    maxReplicas: 1
     imagePullSecrets:
     - name: ghcr-pull
     containers:
     - name: kserve-container
-      image: ghcr.io/yeonjukim164/income-classifier-kserve:1db92c4
+      image: ghcr.io/yeonjukim164/income-classifier-kserve:8870940
       command: ["python", "transformer.py"]   # KServe 가 --model_name, --predictor_host, --http_port 를 붙여 줌
       env:
       - {name: MLFLOW_HOST, value: "http://mlflow.mlops.svc.cluster.local:5000"}
@@ -46,6 +49,11 @@ spec:
         valueFrom: {secretKeyRef: {name: kserve-s3, key: AWS_SECRET_ACCESS_KEY}}
       - name: FEAST_REDIS_PASSWORD
         valueFrom: {secretKeyRef: {name: valkey, key: VALKEY_PASSWORD}}
+      # 6.2.3 실시간 드리프트: 최근 요청 100건을 MLflow run 의 참조 데이터셋과 비교해 Evidently 프로젝트에 기록
+      - {name: EVIDENTLY_WORKSPACE_URL, value: "http://evidently-ui.mlops.svc.cluster.local:8000"}
+      - {name: EVIDENTLY_PROJECT_NAME, value: income-classifier}
+      - {name: EVIDENTLY_REPORT_WINDOW_SIZE, value: "100"}
+      - {name: REFERENCE_DATASET_NAME, value: reference_features}
       resources:
-        requests: {cpu: 100m, memory: 384Mi}
-        limits: {memory: 1Gi}
+        requests: {cpu: 100m, memory: 512Mi}
+        limits: {memory: 2Gi}
