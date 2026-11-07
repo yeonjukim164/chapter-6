@@ -1,0 +1,18 @@
+# 실행: kubectl -n mlops create configmap drift-window --from-file=evidently/homelab/drift_window.py && kubectl apply -f evidently/homelab/drift-window-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata: {name: drift-window, namespace: mlops}
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: drift
+        image: python:3.12-slim
+        # Evidently 최신 버전 (PyPI 0.7.23). pandas 3 에서는 evidently.legacy import 오류 → pandas<3
+        command: ["sh", "-c", "pip install -q --root-user-action=ignore 'evidently==0.7.23' 'pandas<3' minio && python /work/drift_window.py"]
+        envFrom: [{secretRef: {name: kserve-s3}}]
+        volumeMounts: [{name: work, mountPath: /work}]
+        resources: {requests: {cpu: 500m, memory: 512Mi}, limits: {memory: 2Gi}}
+      volumes: [{name: work, configMap: {name: drift-window}}]
