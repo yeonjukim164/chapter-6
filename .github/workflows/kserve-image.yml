@@ -1,0 +1,36 @@
+# KServe Predictor/Transformer 공용 이미지를 빌드해 GHCR 에 올린다 (Yatai image-builder 대체)
+# 태그: 커밋 해시 앞 7자리 (InferenceService 가 이 태그를 고정해서 씀)
+name: kserve-image
+on:
+  push:
+    branches: [main]
+    paths:
+      - kserve/Dockerfile
+      - kserve/*.py
+      - kserve/requirements.txt
+      - bentoml/src/**
+      - .github/workflows/kserve-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: tag
+        run: echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: kserve/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/income-classifier-kserve:${{ steps.tag.outputs.tag }}

@@ -1,0 +1,51 @@
+# 소득 분류기 InferenceService (Yatai 의 BentoDeployment 대체)
+#   transformer = 책의 API 서버: user_id → Feast 온라인 피처 → 더미 컬럼, 예측값 → 레이블
+#   predictor   = 책의 러너: MLflow 로 저장한 sklearn 모델로 예측
+# 이미지는 GHCR 비공개 패키지라 imagePullSecrets(ghcr-pull) 로 받음
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: income-classifier
+  namespace: mlops
+spec:
+  predictor:
+    serviceAccountName: kserve-s3
+    imagePullSecrets:
+    - name: ghcr-pull
+    containers:
+    - name: kserve-container
+      image: ghcr.io/yeonjukim164/income-classifier-kserve:TAG
+      command: ["python", "predictor.py", "--model_name", "income-classifier"]
+      env:
+      # MLflow 레지스트리의 random-forest-classifier v1(Production) 모델 위치. storage-initializer 가 /mnt/models 로 내려받음
+      - name: STORAGE_URI
+        value: s3://mlflow/artifacts/3/models/m-cf7cb121916b4d02993e6976bbfa3b87/artifacts
+      resources:
+        requests: {cpu: 100m, memory: 384Mi}
+        limits: {memory: 1Gi}
+  transformer:
+    imagePullSecrets:
+    - name: ghcr-pull
+    containers:
+    - name: kserve-container
+      image: ghcr.io/yeonjukim164/income-classifier-kserve:TAG
+      command: ["python", "transformer.py"]   # KServe 가 --model_name, --predictor_host, --http_port 를 붙여 줌
+      env:
+      - {name: MLFLOW_HOST, value: "http://mlflow.mlops.svc.cluster.local:5000"}
+      - {name: MLFLOW_MODEL_NAME, value: random-forest-classifier}
+      - {name: MLFLOW_MODEL_STAGE, value: Production}
+      - {name: MINIO_HOST, value: "seaweedfs.kubeflow.svc.cluster.local:9000"}
+      - {name: FEATURE_REGISTRY_BUCKET_NAME, value: feature-registry}
+      - {name: FEATURE_REGSITRY_FILE_NAME, value: feature_store.yaml}   # 책의 키 이름(오타 포함) 그대로
+      - {name: FEAST_S3_ENDPOINT_URL, value: "http://seaweedfs.kubeflow.svc.cluster.local:9000"}
+      - {name: AWS_ENDPOINT_URL, value: "http://seaweedfs.kubeflow.svc.cluster.local:9000"}
+      - {name: FEAST_REDIS_HOST, value: valkey.mlops.svc.cluster.local}
+      - name: MINIO_ACCESS_KEY
+        valueFrom: {secretKeyRef: {name: kserve-s3, key: AWS_ACCESS_KEY_ID}}
+      - name: MINIO_SECRET_KEY
+        valueFrom: {secretKeyRef: {name: kserve-s3, key: AWS_SECRET_ACCESS_KEY}}
+      - name: FEAST_REDIS_PASSWORD
+        valueFrom: {secretKeyRef: {name: valkey, key: VALKEY_PASSWORD}}
+      resources:
+        requests: {cpu: 100m, memory: 384Mi}
+        limits: {memory: 1Gi}

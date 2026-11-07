@@ -1,0 +1,11 @@
+# KServe Predictor / Transformer 공용 이미지. 서버·모델 버전에 맞춤
+#   MLflow = 서버 3.17.2, Feast = 0.67.0 (4·5장과 같음)
+#   KServe SDK 는 0.21.0: 0.18~0.19 는 starlette==0.49.1 고정이라 Feast 0.67(starlette>=1.0.1)과 같이 설치 불가.
+#   컨트롤러(0.18.0)와는 HTTP(v1 프로토콜)로만 통신하므로 컨테이너 안 SDK 버전은 달라도 됨
+#   scikit-learn 1.9.1 = 4장에서 모델을 저장한 버전 (cloudpickle 모델이라 같아야 함)
+kserve==0.21.0
+mlflow==3.17.2
+scikit-learn==1.9.1
+pandas<3
+feast[aws,redis]==0.67.0
+minio==7.2.20
