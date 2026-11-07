@@ -1,15 +1,20 @@
-"""책 build_evidently_dashboard.py 를 Evidently 0.7.23 API 로 옮김: income-classifier 프로젝트 + 패널
-실행: kubectl -n mlops exec -i deploy/evidently-ui -- python - < evidently/homelab/build_dashboard.py"""
+"""책 build_evidently_dashboard.py 를 Evidently 0.7.23 API 로 옮김: 프로젝트 + 패널
+실행: kubectl -n mlops exec -i deploy/evidently-ui -- python - [프로젝트 이름] [대시보드 제목] < evidently/homelab/build_dashboard.py
+  실시간(Transformer): income-classifier (기본값) / 배치(KFP): income-classifier-batch"""
+import sys
+
 from evidently.sdk.models import PanelMetric
 from evidently.sdk.panels import bar_plot_panel, counter_panel, line_plot_panel, text_panel
 from evidently.ui.workspace import RemoteWorkspace
 
 ws = RemoteWorkspace("http://localhost:8000")
-found = ws.search_project("income-classifier")
-project = found[0] if found else ws.create_project("income-classifier", description="Used to classify users into multiple income bands")
+name = sys.argv[1] if len(sys.argv) > 1 else "income-classifier"
+title = sys.argv[2] if len(sys.argv) > 2 else "Income Classifier Data Drift Dashboard"
+found = ws.search_project(name)
+project = found[0] if found else ws.create_project(name, description="Used to classify users into multiple income bands")
 share = PanelMetric(legend="share", metric="DriftedColumnsCount", metric_labels={"value_type": "share"})
 panels = [
-    text_panel(title="Income Classifier Data Drift Dashboard"),
+    text_panel(title=title),
     counter_panel(title="Model Calls", values=[PanelMetric(legend="count", metric="RowCount")], size="half", aggregation="sum"),
     counter_panel(title="Share of Drifted Features", values=[share], size="half", aggregation="last"),
     line_plot_panel(title="Dataset Drift Share", values=[share]),

@@ -169,7 +169,7 @@ deploymentSpec:
         - '{{$.inputs.parameters[''evidently_workspace_url'']}}'
         - --evidently_ui_project_name
         - '{{$.inputs.parameters[''evidently_ui_project_name'']}}'
-        image: varunmallya/inference_pipeline:v24
+        image: ghcr.io/yeonjukim164/income-classifier-kserve:2f2c550
     exec-model-inference:
       container:
         command:
@@ -193,7 +193,7 @@ deploymentSpec:
         - '{{$.inputs.artifacts[''input_data''].path}}'
         - --data_output
         - '{{$.outputs.artifacts[''data_output''].path}}'
-        image: varunmallya/inference_pipeline:v26
+        image: ghcr.io/yeonjukim164/income-classifier-kserve:2f2c550
     exec-read-data-from-minio:
       container:
         command:
@@ -211,7 +211,7 @@ deploymentSpec:
         - '{{$.inputs.parameters[''file_name'']}}'
         - --data_output_path
         - '{{$.outputs.artifacts[''data_output''].path}}'
-        image: varunmallya/inference_pipeline:v22
+        image: ghcr.io/yeonjukim164/income-classifier-kserve:2f2c550
     exec-retrieve-features-from-feast:
       container:
         command:
@@ -233,7 +233,7 @@ deploymentSpec:
         - '{{$.inputs.parameters[''feature_list'']}}'
         - --data_output
         - '{{$.outputs.artifacts[''data_output''].path}}'
-        image: varunmallya/inference_pipeline:v22
+        image: ghcr.io/yeonjukim164/income-classifier-kserve:2f2c550
     exec-write-data-to-minio:
       container:
         args:
@@ -252,7 +252,7 @@ deploymentSpec:
         command:
         - python3
         - /app/src/write_data/write_data.py
-        image: varunmallya/inference_pipeline:v28
+        image: ghcr.io/yeonjukim164/income-classifier-kserve:2f2c550
 pipelineInfo:
   description: A Kubeflow pipeline to classify income categories using KFP v2
   name: income-classifier-pipeline
@@ -433,4 +433,39 @@ root:
       secret_key:
         parameterType: STRING
 schemaVersion: 2.1.0
-sdkVersion: kfp-2.9.0
+sdkVersion: kfp-2.16.1
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-detect-drift:
+          imagePullSecret:
+          - secretName: ghcr-pull
+            secretNameParameter:
+              runtimeValue:
+                constant: ghcr-pull
+        exec-model-inference:
+          imagePullSecret:
+          - secretName: ghcr-pull
+            secretNameParameter:
+              runtimeValue:
+                constant: ghcr-pull
+        exec-read-data-from-minio:
+          imagePullSecret:
+          - secretName: ghcr-pull
+            secretNameParameter:
+              runtimeValue:
+                constant: ghcr-pull
+        exec-retrieve-features-from-feast:
+          imagePullSecret:
+          - secretName: ghcr-pull
+            secretNameParameter:
+              runtimeValue:
+                constant: ghcr-pull
+        exec-write-data-to-minio:
+          imagePullSecret:
+          - secretName: ghcr-pull
+            secretNameParameter:
+              runtimeValue:
+                constant: ghcr-pull
