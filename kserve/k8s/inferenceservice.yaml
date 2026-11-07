@@ -14,7 +14,7 @@ spec:
     - name: ghcr-pull
     containers:
     - name: kserve-container
-      image: ghcr.io/yeonjukim164/income-classifier-kserve:TAG
+      image: ghcr.io/yeonjukim164/income-classifier-kserve:1db92c4
       command: ["python", "predictor.py", "--model_name", "income-classifier"]
       env:
       # MLflow 레지스트리의 random-forest-classifier v1(Production) 모델 위치. storage-initializer 가 /mnt/models 로 내려받음
@@ -28,7 +28,7 @@ spec:
     - name: ghcr-pull
     containers:
     - name: kserve-container
-      image: ghcr.io/yeonjukim164/income-classifier-kserve:TAG
+      image: ghcr.io/yeonjukim164/income-classifier-kserve:1db92c4
       command: ["python", "transformer.py"]   # KServe 가 --model_name, --predictor_host, --http_port 를 붙여 줌
       env:
       - {name: MLFLOW_HOST, value: "http://mlflow.mlops.svc.cluster.local:5000"}
