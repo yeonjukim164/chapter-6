@@ -20,15 +20,20 @@ aiosignal==1.4.0
 alembic==1.20.1
     # via mlflow
 annotated-doc==0.0.5
-    # via fastapi
+    # via
+    #   fastapi
+    #   typer
 annotated-types==0.8.0
     # via pydantic
 anyio==4.16.0
     # via
     #   httpx
+    #   litestar
     #   mlflow-skinny
     #   starlette
     #   watchfiles
+appdirs==1.4.4
+    # via iterative-telemetry
 argon2-cffi==25.1.0
     # via minio
 argon2-cffi-bindings==26.1.0
@@ -57,6 +62,7 @@ cachetools==7.3.0
 certifi==2026.10.23
     # via
     #   databricks-sdk
+    #   evidently
     #   httpcore
     #   httpx
     #   kubernetes
@@ -73,7 +79,10 @@ click==8.5.1
     #   dask
     #   feast
     #   flask
+    #   litestar
     #   mlflow-skinny
+    #   nltk
+    #   rich-click
     #   uvicorn
 cloudevents==1.13.0
     # via kserve
@@ -88,6 +97,7 @@ contourpy==1.4.0
     # via matplotlib
 cryptography==50.0.2
     # via
+    #   evidently
     #   google-auth
     #   kserve
     #   mlflow
@@ -99,14 +109,26 @@ databricks-sdk==0.162.0
     # via
     #   mlflow-skinny
     #   mlflow-tracing
+defusedxml==0.7.1
+    # via nltk
 deprecation==2.1.0
-    # via cloudevents
+    # via
+    #   cloudevents
+    #   evidently
 dill==0.4.1
     # via feast
+distro==1.9.0
+    # via iterative-telemetry
 docker==7.2.0
     # via mlflow
 durationpy==0.11
     # via kubernetes
+dynaconf==3.3.5
+    # via evidently
+evidently==0.7.23
+    # via -r requirements.in
+faker==40.44.0
+    # via polyfactory
 fastapi==0.162.0
     # via
     #   feast
@@ -114,6 +136,8 @@ fastapi==0.162.0
     #   mlflow-skinny
 feast==0.67.0
     # via -r requirements.in
+filelock==4.2.9
+    # via iterative-telemetry
 flask==3.1.3
     # via
     #   flask-cors
@@ -122,6 +146,8 @@ flask-cors==6.0.5
     # via mlflow
 fonttools==4.68.0
     # via matplotlib
+formulaic==1.2.2
+    # via statsmodels
 frozenlist==1.8.0
     # via
     #   aiohttp
@@ -129,6 +155,7 @@ frozenlist==1.8.0
 fsspec==2026.9.0
     # via
     #   dask
+    #   evidently
     #   feast
 gitdb==4.0.12
     # via gitpython
@@ -170,7 +197,9 @@ httpcore==1.0.9
 httptools==0.9.0
     # via uvicorn
 httpx==0.28.1
-    # via kserve
+    # via
+    #   kserve
+    #   litestar
 huey==3.5.4
     # via mlflow
 idna==3.20
@@ -181,6 +210,10 @@ idna==3.20
     #   yarl
 importlib-metadata==9.1.0
     # via mlflow-skinny
+interface-meta==2.0.1
+    # via formulaic
+iterative-telemetry==0.0.10
+    # via evidently
 itsdangerous==2.2.0
     # via flask
 jinja2==3.1.6
@@ -193,7 +226,9 @@ jmespath==1.1.0
     #   boto3
     #   botocore
 joblib==1.6.0
-    # via scikit-learn
+    # via
+    #   nltk
+    #   scikit-learn
 kiwisolver==1.5.1
     # via matplotlib
 kserve==0.21.0
@@ -202,10 +237,16 @@ kubernetes==37.0.1
     # via kserve
 librt==0.16.0
     # via mypy
+litestar==2.25.0
+    # via evidently
+litestar-htmx==0.5.0
+    # via litestar
 locket==1.0.0
     # via partd
 mako==1.4.3
     # via alembic
+markdown-it-py==4.2.0
+    # via rich
 markupsafe==3.0.4
     # via
     #   flask
@@ -214,6 +255,8 @@ markupsafe==3.0.4
     #   werkzeug
 matplotlib==3.11.2
     # via mlflow
+mdurl==0.1.2
+    # via markdown-it-py
 minio==7.2.20
     # via -r requirements.in
 mlflow==3.17.2
@@ -224,29 +267,44 @@ mlflow-tracing==3.17.2
     # via mlflow
 mmh3==5.3.1
     # via feast
+msgspec==0.22.0
+    # via litestar
 multidict==7.2.1
     # via
     #   aiobotocore
     #   aiohttp
+    #   litestar
     #   yarl
+multipart==2.0.1
+    # via litestar
 mypy==2.4.1
     # via sqlalchemy
 mypy-extensions==1.2.0
-    # via mypy
+    # via
+    #   mypy
+    #   typing-inspect
 narwhals==2.28.0
-    # via scikit-learn
+    # via
+    #   formulaic
+    #   scikit-learn
+nltk==3.10.4
+    # via evidently
 numpy==2.5.4
     # via
     #   contourpy
     #   dask
+    #   evidently
     #   feast
+    #   formulaic
     #   kserve
     #   matplotlib
     #   mlflow
     #   pandas
+    #   patsy
     #   scikit-learn
     #   scipy
     #   skops
+    #   statsmodels
 oauthlib==4.0.1
     # via requests-oauthlib
 opentelemetry-api==1.45.2
@@ -258,6 +316,7 @@ opentelemetry-api==1.45.2
     #   opentelemetry-semantic-conventions
 opentelemetry-proto==1.45.2
     # via
+    #   evidently
     #   mlflow-skinny
     #   mlflow-tracing
 opentelemetry-sdk==1.45.2
@@ -275,22 +334,34 @@ packaging==26.3
     #   matplotlib
     #   mlflow-skinny
     #   mlflow-tracing
+    #   patsy
+    #   plotly
     #   skops
+    #   statsmodels
 pandas==2.3.3
     # via
     #   -r requirements.in
     #   dask
+    #   evidently
     #   feast
+    #   formulaic
     #   kserve
     #   mlflow
+    #   statsmodels
 partd==1.4.2
     # via dask
 pathspec==1.1.1
     # via mypy
+patsy==1.0.3
+    # via statsmodels
 pillow==13.0.0
     # via
     #   kserve
     #   matplotlib
+plotly==5.24.1
+    # via evidently
+polyfactory==3.5.0
+    # via litestar
 prettytable==3.18.0
     # via skops
 prometheus-client==0.24.1
@@ -319,6 +390,7 @@ pyarrow==25.0.1
     #   dask
     #   feast
     #   mlflow
+    #   pandas
 pyasn1==0.6.5
     # via
     #   kserve
@@ -331,6 +403,7 @@ pycryptodome==4.4.0
     # via minio
 pydantic==2.14.3
     # via
+    #   evidently
     #   fastapi
     #   feast
     #   kserve
@@ -340,7 +413,9 @@ pydantic==2.14.3
 pydantic-core==2.50.4
     # via pydantic
 pygments==2.21.0
-    # via feast
+    # via
+    #   feast
+    #   rich
 pyjwt==2.15.1
     # via
     #   feast
@@ -367,37 +442,57 @@ pytz==2026.6
 pyyaml==6.0.3
     # via
     #   dask
+    #   evidently
     #   feast
     #   kserve
     #   kubernetes
+    #   litestar
     #   mlflow-skinny
     #   uvicorn
 redis==7.4.1
     # via feast
+regex==2026.11.7
+    # via nltk
 requests==2.34.2
     # via
     #   databricks-sdk
     #   docker
+    #   evidently
     #   feast
+    #   iterative-telemetry
     #   kubernetes
     #   mlflow-skinny
     #   requests-oauthlib
 requests-oauthlib==2.0.0
     # via kubernetes
+rich==15.0.0
+    # via
+    #   evidently
+    #   litestar
+    #   rich-click
+    #   typer
+rich-click==1.9.9
+    # via litestar
 s3transfer==0.19.3
     # via boto3
 scikit-learn==1.9.1
     # via
     #   -r requirements.in
+    #   evidently
     #   mlflow
     #   skops
 scipy==1.18.1
     # via
+    #   evidently
+    #   formulaic
     #   mlflow
     #   scikit-learn
     #   skops
+    #   statsmodels
 setuptools==84.2.1
     # via grpcio-tools
+shellingham==1.5.4
+    # via typer
 six==1.17.0
     # via
     #   kserve
@@ -406,6 +501,8 @@ skops==0.16.0
     # via mlflow
 smmap==5.0.3
     # via gitdb
+sniffio==1.3.1
+    # via litestar
 sqlalchemy==2.1.8
     # via
     #   alembic
@@ -419,12 +516,16 @@ starlette==1.10.0
     #   feast
     #   kserve
     #   mlflow-skinny
+statsmodels==0.15.0
+    # via evidently
 tabulate==0.10.0
     # via
     #   feast
     #   kserve
 tenacity==8.5.0
-    # via feast
+    # via
+    #   feast
+    #   plotly
 threadpoolctl==3.8.0
     # via scikit-learn
 timing-asgi==0.3.2
@@ -436,9 +537,13 @@ toolz==1.2.0
     #   dask
     #   partd
 tqdm==4.70.1
-    # via feast
+    # via
+    #   feast
+    #   nltk
 typeguard==4.6.0
     # via feast
+typer==0.28.0
+    # via evidently
 types-greenlet==3.5.0.20260518
     # via sqlalchemy
 typing-extensions==4.16.0
@@ -448,38 +553,50 @@ typing-extensions==4.16.0
     #   alembic
     #   anyio
     #   fastapi
+    #   formulaic
     #   graphene
     #   grpcio
     #   kubernetes
+    #   litestar
     #   minio
     #   mlflow-skinny
     #   mypy
     #   opentelemetry-api
     #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions
+    #   polyfactory
     #   pydantic
     #   pydantic-core
     #   sqlalchemy
     #   starlette
     #   typeguard
+    #   typing-inspect
     #   typing-inspection
+typing-inspect==0.9.0
+    # via evidently
 typing-inspection==0.4.5
     # via
     #   fastapi
     #   pydantic
 tzdata==2026.6
     # via pandas
+ujson==6.1.0
+    # via evidently
 urllib3==2.8.0
     # via
     #   botocore
     #   databricks-sdk
     #   docker
+    #   evidently
     #   kserve
     #   kubernetes
     #   minio
     #   requests
+uuid6==2025.0.1
+    # via evidently
 uvicorn==0.54.0
     # via
+    #   evidently
     #   feast
     #   kserve
     #   mlflow-skinny
@@ -488,6 +605,8 @@ uvicorn-worker==0.4.0
     # via feast
 uvloop==0.23.0
     # via uvicorn
+watchdog==7.1.0
+    # via evidently
 watchfiles==1.3.0
     # via
     #   kserve
@@ -503,7 +622,9 @@ werkzeug==3.1.9
     #   flask
     #   flask-cors
 wrapt==2.5.2
-    # via aiobotocore
+    # via
+    #   aiobotocore
+    #   formulaic
 yarl==1.25.1
     # via aiohttp
 zipp==4.1.2
